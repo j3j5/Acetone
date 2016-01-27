@@ -1,7 +1,7 @@
 Acetone
 =======
 
-Laravel4 package for purging, refreshing &amp; banning cached items in Varnish
+Laravel5 package for purging, refreshing &amp; banning cached items in Varnish
 
 Using web accelerators such as varnish to speed up your web application has become common place. This small package is designed to alleviate the problem of cache expiration with dynamic data generated sites.
 

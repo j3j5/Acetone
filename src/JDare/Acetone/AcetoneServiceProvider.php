@@ -20,7 +20,10 @@ class AcetoneServiceProvider extends ServiceProvider {
 	 */
 	public function boot()
 	{
-		$this->package('jdare/acetone');
+		// Publish config files
+        $this->publishes([
+            __DIR__.'/../config/config.php' => config_path('acetone.php'),
+        ]);
 	}
 
 	/**

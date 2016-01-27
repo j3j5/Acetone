@@ -1,16 +1,20 @@
 {
-    "name": "jdare/acetone",
-    "description": "Laravel4 package for purging & banning cached items in Varnish",
+    "name": "ademes/acetone",
+    "description": "Laravel5 package for purging & banning cached items in Varnish",
     "keywords": ["varnish", "laravel", "purge", "ban"],
     "authors": [
         {
             "name": "JDare",
             "email": "jeremy.d.dare@gmail.com"
+        },
+        {
+            "name": "Huajun Li",
+            "email": "lhj1982@gmail.com"
         }
     ],
     "require": {
-        "php": ">=5.3.0",
-        "illuminate/support": "4.x",
+        "php": ">=5.5.9",
+        "illuminate/support": "v5.1.*",
         "guzzle/guzzle": "3.7.*"
     },
     "autoload": {
@@ -18,5 +22,5 @@
             "JDare\\Acetone": "src/"
         }
     },
-    "minimum-stability": "dev"
+    "minimum-stability": "stable"
 }

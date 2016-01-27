@@ -2,7 +2,6 @@
 
 namespace JDare\Acetone;
 
-use Config;
 use App;
 use Guzzle\Http\Client, Guzzle\Http\Exception\ClientErrorResponseException;
 use JDare\Acetone\Exceptions\AcetoneException;
@@ -11,17 +10,18 @@ class Acetone
 {
 
     private $server, $forceException;
-
+    private $config;
     public function __construct()
     {
-        $this->server = trim(Config::get("acetone::server.address"), "/");
+        $this->config = config('acetone');
+        $this->server = trim($this->config['server']['address'], "/");
         if (!$this->server)
             throw new AcetoneException("Varnish server address configuration must be specified");
         if (strpos($this->server, "http://") === false)
         {
             $this->server = "http://" . $this->server;
         }
-        $this->forceException = Config::get("acetone::force_exceptions", 'auto');
+        $this->forceException = array_key_exists('force_exceptions', $this->config) ? $this->config['force_exceptions'] : 'auto';
     }
 
     /**
@@ -83,7 +83,7 @@ class Acetone
 
         $client = new Client($this->server);
         $request = $client->createRequest("BAN", $path, array(
-            Config::get("acetone::ban_url_header", "x-ban-url") => $path,
+        array_key_exists('ban_url_header', $this->config) ? $this->config['ban_url_header'] : "x-ban-url" => $path,
         ));
 
         try {
