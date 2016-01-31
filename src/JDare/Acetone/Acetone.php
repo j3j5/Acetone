@@ -38,7 +38,18 @@ class Acetone
         if (is_array($url))
             return array_walk($url, array($this, "purge"));
 
-        return $this->simpleCacheRequest("PURGE", $url);
+        try {
+            $curl = curl_init($this->server.$url);
+            curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "PURGE");
+            curl_setopt($curl, CURLOPT_RETURNTRANSFER, true); 
+            $output = curl_exec($curl);
+            \Log::debug($output);
+            return true;
+        } catch (\Exception $e) {
+            \Log::error($e);
+            return false;
+        }
+        //return $this->simpleCacheRequest("PURGE", $url);
     }
 
     /**
