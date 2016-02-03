@@ -39,6 +39,7 @@ class Acetone
             return array_walk($url, array($this, "purge"));
 
         try {
+            \Log::debug("Purging: ".$url);
             $curl = curl_init($this->server.$url);
             curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "PURGE");
             curl_setopt($curl, CURLOPT_RETURNTRANSFER, true); 
@@ -83,15 +84,28 @@ class Acetone
         $path = null;
         if ($regex == false)
         {
-            $url = parse_url($url);
+            $url = parse_url($this->server.$url);
             if (isset($url['path']))
                 $path = "^" . $url['path'] . "$";
             else
                 throw new AcetoneException("URL to Ban could not be parsed");
         }else{
-            $path = $url;
+            $path = $this->server.$url;
         }
 
+        try {
+            \Log::debug("Banning: ".$path);
+            $curl = curl_init($path);
+            curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "BAN");
+            curl_setopt($curl, CURLOPT_RETURNTRANSFER, true); 
+            $output = curl_exec($curl);
+            \Log::debug($output);
+            return true;
+        } catch (\Exception $e) {
+            \Log::error($e);
+            return false;
+        }
+        /*
         $client = new Client($this->server);
         $request = $client->createRequest("BAN", $path, array(
         array_key_exists('ban_url_header', $this->config) ? $this->config['ban_url_header'] : "x-ban-url" => $path,
@@ -109,7 +123,7 @@ class Acetone
         {
             return true;
         }
-        return false;
+        return false;*/
     }
 
     /**
