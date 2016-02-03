@@ -84,15 +84,15 @@ class Acetone
         $path = null;
         if ($regex == false)
         {
-            $url = parse_url($this->server.$url);
+            $url = parse_url($url);
             if (isset($url['path']))
                 $path = "^" . $url['path'] . "$";
             else
                 throw new AcetoneException("URL to Ban could not be parsed");
         }else{
-            $path = $this->server.$url;
+            $path = $url;
         }
-
+/*
         try {
             \Log::debug("Banning: ".$path);
             $curl = curl_init($path);
@@ -104,8 +104,8 @@ class Acetone
         } catch (\Exception $e) {
             \Log::error($e);
             return false;
-        }
-        /*
+        }*/
+        \Log::debug("Banning: ".$path);
         $client = new Client($this->server);
         $request = $client->createRequest("BAN", $path, array(
         array_key_exists('ban_url_header', $this->config) ? $this->config['ban_url_header'] : "x-ban-url" => $path,
@@ -123,7 +123,7 @@ class Acetone
         {
             return true;
         }
-        return false;*/
+        return false;
     }
 
     /**
