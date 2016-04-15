@@ -3,7 +3,8 @@
 namespace JDare\Acetone;
 
 use App;
-use Guzzle\Http\Client, Guzzle\Http\Exception\ClientErrorResponseException;
+use Guzzle\Http\Client;
+use Guzzle\Http\Exception\ClientErrorResponseException;
 use JDare\Acetone\Exceptions\AcetoneException;
 
 class Acetone
@@ -15,10 +16,10 @@ class Acetone
     {
         $this->config = config('acetone');
         $this->server = trim($this->config['server']['address'], "/");
-        if (!$this->server)
+        if (!$this->server) {
             throw new AcetoneException("Varnish server address configuration must be specified");
-        if (strpos($this->server, "http://") === false)
-        {
+        }
+        if (strpos($this->server, "http://") === false) {
             $this->server = "http://" . $this->server;
         }
         $this->forceException = array_key_exists('force_exceptions', $this->config) ? $this->config['force_exceptions'] : 'auto';
@@ -29,20 +30,21 @@ class Acetone
      * Warning: if purging many URLs, use banMany instead, it has significant performance benefits.
      *
      *
-     * @param $url
+     * @param string|array $url
      * @return bool True on success, False on failure
      * @throws Exceptions\AcetoneException
      */
     public function purge($url)
     {
-        if (is_array($url))
+        if (is_array($url)) {
             return array_walk($url, array($this, "purge"));
+        }
 
         try {
             \Log::debug("Purging: ".$url);
             $curl = curl_init($this->server.$url);
             curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "PURGE");
-            curl_setopt($curl, CURLOPT_RETURNTRANSFER, true); 
+            curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
             $output = curl_exec($curl);
             \Log::debug($output);
             return true;
@@ -61,8 +63,9 @@ class Acetone
      */
     public function refresh($url)
     {
-        if (is_array($url))
+        if (is_array($url)) {
             return array_walk($url, array($this, "refresh"));
+        }
 
         return $this->simpleCacheRequest("REFRESH", $url);
     }
@@ -78,18 +81,19 @@ class Acetone
      */
     public function ban($url, $regex = false)
     {
-        if (is_array($url))
+        if (is_array($url)) {
             return array_walk($url, array($this, "ban"));
+        }
 
         $path = null;
-        if ($regex == false)
-        {
+        if ($regex == false) {
             $url = parse_url($url);
-            if (isset($url['path']))
+            if (isset($url['path'])) {
                 $path = "^" . $url['path'] . "$";
-            else
+            } else {
                 throw new AcetoneException("URL to Ban could not be parsed");
-        }else{
+            }
+        } else {
             $path = $url;
         }
 /*
@@ -113,14 +117,12 @@ class Acetone
 
         try {
             $response = $request->send();
-        }catch (ClientErrorResponseException $e)
-        {
+        } catch (ClientErrorResponseException $e) {
             $this->handleException($e);
             return false;
         }
 
-        if ($response->getStatusCode() == 200)
-        {
+        if ($response->getStatusCode() == 200) {
             return true;
         }
         return false;
@@ -141,11 +143,9 @@ class Acetone
      */
     public function banMany($urlPrefix)
     {
-        if (is_array($urlPrefix))
-        {
+        if (is_array($urlPrefix)) {
             $banString = "(";
-            foreach($urlPrefix as $url)
-            {
+            foreach ($urlPrefix as $url) {
                 $banString .= "^" . $url . "|" ;
             }
             $banString = trim($banString, "|") . ")";
@@ -155,7 +155,7 @@ class Acetone
     }
 
     /**
-     * Fundementals for placing a simple cache invalidation request to Varnish.
+     * Fundamentals for placing a simple cache invalidation request to Varnish.
      *
      * @param $method
      * @param $url
@@ -166,22 +166,21 @@ class Acetone
     {
         $url = parse_url($url);
         $path = null;
-        if (isset($url['path']))
+        if (isset($url['path'])) {
             $path = $url['path'];
-        else
+        } else {
             throw new AcetoneException("URL could not be parsed");
+        }
 
         $client = new Client($this->server);
         $request = $client->createRequest($method, $path);
         try {
             $response = $request->send();
-        }catch (ClientErrorResponseException $e)
-        {
+        } catch (ClientErrorResponseException $e) {
             $this->handleException($e);
             return false;
         }
-        if ($response->getStatusCode() == 200)
-        {
+        if ($response->getStatusCode() == 200) {
             return true;
         }
         return false;
@@ -195,10 +194,12 @@ class Acetone
      */
     private function handleException(\Exception $e)
     {
-        if (App::environment() !== "production" && $this->forceException === 'auto')
+        if (App::environment() !== "production" && $this->forceException === 'auto') {
             throw $e;
+        }
 
-        if ($this->forceException === true)
+        if ($this->forceException === true) {
             throw $e;
+        }
     }
 }
