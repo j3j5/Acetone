@@ -10,11 +10,15 @@
         {
             "name": "Huajun Li",
             "email": "lhj1982@gmail.com"
+        },
+        {
+            "name": "Julio Foulquie",
+            "email": "the.j3j5@gmail.com"
         }
     ],
     "require": {
         "php": ">=5.5.9",
-        "illuminate/support": "v5.1.*",
+        "illuminate/support": "5.*",
         "guzzle/guzzle": "3.7.*"
     },
     "autoload": {
