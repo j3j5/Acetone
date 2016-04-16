@@ -8,6 +8,15 @@ class AcetoneServiceProvider extends ServiceProvider
 {
 
     /**
+     * The commands to be registered from the package.
+     *
+     * @var array
+     */
+    protected $commands = [
+        Commands\CLICommander::class,
+    ];
+
+    /**
      * Indicates if loading of the provider is deferred.
      *
      * @var bool
@@ -23,8 +32,8 @@ class AcetoneServiceProvider extends ServiceProvider
     {
         // Publish config files
         $this->publishes([
-            __DIR__.'/../config/config.php' => config_path('acetone.php'),
-        ]);
+            realpath(__DIR__.'/../config/config.php') => config_path('acetone.php'),
+        ], 'config');
     }
 
     /**
@@ -34,13 +43,13 @@ class AcetoneServiceProvider extends ServiceProvider
      */
     public function register()
     {
+
         $this->app->booting(function () {
             $loader = \Illuminate\Foundation\AliasLoader::getInstance();
             $loader->alias('Acetone', 'JDare\Acetone\Facades\Acetone');
         });
-
-        $this->app['acetone'] = $this->app->share(function ($app) {
-            return new Acetone;
+        $this->app->bind('acetone', function ($app) {
+            return new Acetone($app);
         });
     }
 

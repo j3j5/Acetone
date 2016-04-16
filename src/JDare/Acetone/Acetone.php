@@ -3,6 +3,7 @@
 namespace JDare\Acetone;
 
 use App;
+use Log;
 use Guzzle\Http\Client;
 use Guzzle\Http\Exception\ClientErrorResponseException;
 use JDare\Acetone\Exceptions\AcetoneException;
@@ -10,8 +11,10 @@ use JDare\Acetone\Exceptions\AcetoneException;
 class Acetone
 {
 
-    private $server, $forceException;
     private $config;
+    private $server;
+    private $client;
+    private $forceException;
     public function __construct()
     {
         $this->config = config('acetone');
@@ -22,6 +25,7 @@ class Acetone
         if (strpos($this->server, "http://") === false) {
             $this->server = "http://" . $this->server;
         }
+        $this->client = new Client($this->server);
         $this->forceException = array_key_exists('force_exceptions', $this->config) ? $this->config['force_exceptions'] : 'auto';
     }
 
@@ -36,23 +40,13 @@ class Acetone
      */
     public function purge($url)
     {
+        // For an supplied array, call itself recursively
         if (is_array($url)) {
             return array_walk($url, array($this, "purge"));
         }
 
-        try {
-            \Log::debug("Purging: ".$url);
-            $curl = curl_init($this->server.$url);
-            curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "PURGE");
-            curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-            $output = curl_exec($curl);
-            \Log::debug($output);
-            return true;
-        } catch (\Exception $e) {
-            \Log::error($e);
-            return false;
-        }
-        //return $this->simpleCacheRequest("PURGE", $url);
+        Log::debug("Purging: ".$url);
+        return $this->simpleCacheRequest("PURGE", $url);
     }
 
     /**
@@ -96,24 +90,11 @@ class Acetone
         } else {
             $path = $url;
         }
-/*
-        try {
-            \Log::debug("Banning: ".$path);
-            $curl = curl_init($path);
-            curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "BAN");
-            curl_setopt($curl, CURLOPT_RETURNTRANSFER, true); 
-            $output = curl_exec($curl);
-            \Log::debug($output);
-            return true;
-        } catch (\Exception $e) {
-            \Log::error($e);
-            return false;
-        }*/
-        \Log::debug("Banning: ".$path);
-        $client = new Client($this->server);
-        $request = $client->createRequest("BAN", $path, array(
-        array_key_exists('ban_url_header', $this->config) ? $this->config['ban_url_header'] : "x-ban-url" => $path,
-        ));
+
+        Log::debug("Banning: ".$path);
+        $request = $this->client->createRequest("BAN", $path, [
+            array_key_exists('ban_url_header', $this->config) ? $this->config['ban_url_header'] : "x-ban-url" => $path,
+        ]);
 
         try {
             $response = $request->send();
@@ -172,8 +153,7 @@ class Acetone
             throw new AcetoneException("URL could not be parsed");
         }
 
-        $client = new Client($this->server);
-        $request = $client->createRequest($method, $path);
+        $request = $this->client->createRequest($method, $path);
         try {
             $response = $request->send();
         } catch (ClientErrorResponseException $e) {
@@ -194,7 +174,7 @@ class Acetone
      */
     private function handleException(\Exception $e)
     {
-        if (App::environment() !== "production" && $this->forceException === 'auto') {
+        if (app()::environment('production') && $this->forceException === 'auto') {
             throw $e;
         }
 
