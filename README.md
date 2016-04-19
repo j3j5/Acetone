@@ -11,13 +11,13 @@ Installation
 Begin by adding the following to your `composer.json`
 
     "require": {
-        "jdare/acetone": "dev-master"
+        "ademes/acetone": "dev-master"
     }
   
 Run a composer update `composer update`
 
 
-Add it to your list of providers in laravel `/app/app.php`
+Add it to your list of providers in laravel `/config/app.php`
 
     'providers' => array(
         ...
@@ -26,7 +26,7 @@ Add it to your list of providers in laravel `/app/app.php`
 
 
 
-Publish the configuration file using `php artisan config:publish jdare/acetone`
+Publish the configuration file using `php artisan vendor:publish --provider="JDare\Acetone\AcetoneServiceProvider"`
 
 Configuration
 =======
@@ -47,7 +47,7 @@ Usage
 
 _Please Note_: All these functions assume some sort of standard VCL setup for purging/refreshing/banning. Please check [the docs folder](/docs/sample.default.vcl) for a reference on how your varnish should interpret these requests.
 
-For the differences between Purge, Refresh and Ban, please check the [Varnish documentation](https://www.varnish-cache.org/docs/3.0/tutorial/purging.html).
+For the differences between Purge, Refresh and Ban, please check the [Varnish documentation](http://book.varnish-software.com/4.0/chapters/Cache_Invalidation.html).
 
 ##Purge &amp; Refresh
 When you need to invalidate your cache, you can provide a URL to be removed as a parameter for Acetones functions. Here are some sample usages:
