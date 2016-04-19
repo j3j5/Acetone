@@ -51,6 +51,8 @@ class AcetoneServiceProvider extends ServiceProvider
         $this->app->bind('acetone', function ($app) {
             return new Acetone($app);
         });
+
+        $this->commands($this->commands);
     }
 
     /**
