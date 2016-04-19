@@ -104,7 +104,7 @@ class Acetone
         }
 
         if ($response->getStatusCode() == 200) {
-            return true;
+            return $response;
         }
         return false;
     }
@@ -161,7 +161,7 @@ class Acetone
             return false;
         }
         if ($response->getStatusCode() == 200) {
-            return true;
+            return $response;
         }
         return false;
     }
@@ -174,7 +174,7 @@ class Acetone
      */
     private function handleException(\Exception $e)
     {
-        if (app()::environment('production') && $this->forceException === 'auto') {
+        if (app()->environment('production') && $this->forceException === 'auto') {
             throw $e;
         }
 
