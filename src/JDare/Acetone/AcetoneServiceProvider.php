@@ -32,7 +32,7 @@ class AcetoneServiceProvider extends ServiceProvider
     {
         // Publish config files
         $this->publishes([
-            realpath(__DIR__.'/../config/config.php') => config_path('acetone.php'),
+            realpath(__DIR__.'/../../config/config.php') => config_path('acetone.php'),
         ], 'config');
     }
 
