@@ -15,7 +15,7 @@ return array(
     */
 
     'server' => array(
-        "address" =>        "your-varnish.local",
+        "address" => env("VARNISH_ADDR", "127.0.0.1"),
     ),
 
     /*
@@ -34,7 +34,7 @@ return array(
     |   Supported: "auto", true, false
     */
 
-    'force_exceptions' =>   "auto",
+    'force_exceptions' => env("ACETONE_FORCE_EXCEPTIONS", "auto"),
 
     /*
     |--------------------------------------------------------------------------
@@ -45,5 +45,5 @@ return array(
     |
     */
 
-    'ban_url_header' =>      'x-ban-url',
+    'ban_url_header' => env("ACETONE_HEADER", 'x-ban-url'),
 );
