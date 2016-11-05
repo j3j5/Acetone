@@ -4,8 +4,9 @@ namespace JDare\Acetone;
 
 use App;
 use Log;
-use Guzzle\Http\Client;
-use Guzzle\Http\Exception\ClientErrorResponseException;
+use GuzzleHttp\Client;
+use GuzzleHttp\Psr7\Request;
+use GuzzleHttp\Exception\RequestException;
 use JDare\Acetone\Exceptions\AcetoneException;
 
 class Acetone
@@ -25,7 +26,7 @@ class Acetone
         if (strpos($this->server, "http://") === false) {
             $this->server = "http://" . $this->server;
         }
-        $this->client = new Client($this->server);
+        $this->client = new Client(['base_uri' => $this->server]);
         $this->forceException = array_key_exists('force_exceptions', $this->config) ? $this->config['force_exceptions'] : 'auto';
     }
 
@@ -92,13 +93,14 @@ class Acetone
         }
 
         Log::debug("Banning: ".$path);
-        $request = $this->client->createRequest("BAN", $path, [
+
+        $request = new Request("BAN", $path, [
             array_key_exists('ban_url_header', $this->config) ? $this->config['ban_url_header'] : "x-ban-url" => $path,
         ]);
 
         try {
-            $response = $request->send();
-        } catch (ClientErrorResponseException $e) {
+            $response = $this->client->send($request);
+        } catch (RequestException $e) {
             $this->handleException($e);
             return false;
         }
@@ -153,10 +155,9 @@ class Acetone
             throw new AcetoneException("URL could not be parsed");
         }
 
-        $request = $this->client->createRequest($method, $path);
         try {
-            $response = $request->send();
-        } catch (ClientErrorResponseException $e) {
+            $response = $this->client->$method($path);
+        } catch (RequestException $e) {
             $this->handleException($e);
             return false;
         }
